@@ -7,8 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ExchangerateApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ExchangerateApplication.class, args);
-		System.out.println("App started.");
+		try {
+			SpringApplication.run(ExchangerateApplication.class, args);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
