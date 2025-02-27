@@ -18,12 +18,13 @@ spring:
         hbm2ddl:
           auto: update
     show-sql: false
-  profiles:
-    active: ${active}
   thymeleaf:
     enabled: true
 
 server:
-  port: 8080
+  port: 8081
   servlet:
     context-path: /exchangerate
+
+app:
+  version: ${app.version}

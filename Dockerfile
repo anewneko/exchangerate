@@ -1,12 +1,13 @@
-FROM maven:3.8.6-openjdk-17 AS build
+FROM maven:3.8.7-openjdk-18 AS build
 WORKDIR /app
 COPY . /app
-RUN mvn clean package
+ENV dbhost=mahosql
+RUN mvn clean package -DskipTests
 
 FROM alpine:3
 RUN apk add --no-cache openjdk21
 WORKDIR /app
-COPY ./target/exchangerate-1.0.0.jar /app/myapp.jar
+COPY --from=build /app/target/exchangerate-0.0.1.jar /app/myapp.jar
 ENV active=prod
-EXPOSE 8080
-CMD ["java", "-jar", "myapp.jar"]
+EXPOSE 8081
+CMD ["java","-Duser.timezone=Asia/Taipei" ,"-jar", "myapp.jar"]

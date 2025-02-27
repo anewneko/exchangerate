@@ -2,9 +2,9 @@ package org.mahorobo.exchangerate.domain.component;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Map;
 
 import org.mahorobo.exchangerate.domain.component.service.DataFetchService;
+import org.mahorobo.exchangerate.domain.pojo.ExchangeRateTableVO;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class Coach {
 	private final DataFetchService fSvc;
 	private Date timeFlag = new Date();
-	private Map<String,Object> data;
+	private ExchangeRateTableVO data;
 	
 	
 	public boolean hasData() {
@@ -25,7 +25,7 @@ public class Coach {
 		return timeFlag;
 	}
 
-	public Map<String,Object> getData() throws IOException {
+	public ExchangeRateTableVO getData() throws IOException {
 		if (!hasData()) {
 			data = fSvc.fetch();
 			timeFlag = new Date();

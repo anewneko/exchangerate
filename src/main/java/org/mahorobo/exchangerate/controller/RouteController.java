@@ -1,7 +1,6 @@
 package org.mahorobo.exchangerate.controller;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 
 import org.mahorobo.exchangerate.domain.component.Coach;
 import org.mahorobo.exchangerate.domain.component.service.FetchLogService;
@@ -13,21 +12,15 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-public class HomeController {
+public class RouteController {
 	private final Coach coach;
 	private final FetchLogService flSvc;
 
 	@GetMapping("/")
 	public String index(Model model) throws IOException {
-		var dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		try {
-			model.addAttribute("lastUpdateTime", dateFormat.format(coach.getTimeFlag()));
-			model.addAttribute("table", coach.getData());
-			model.addAttribute("searchTimes", flSvc.getTimeInDays(3));
-			model.addAttribute("message", "Hello, World!");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		model.addAttribute("table", coach.getData());
+		model.addAttribute("searchTimes", flSvc.getTimeInDays(3));
+		model.addAttribute("message", "Hello, World!");
 	    return "index";
 	}
 }

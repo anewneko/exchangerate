@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/582d5ef13f.js" crossorigin="anonymous"></script>
     <style>
         body {
             background-color: rgb(210, 214, 212);
@@ -104,6 +105,24 @@
             margin-bottom: .5rem;
         }
 
+        .table-header button {
+            margin-left: 1.5rem;
+            width: 20px;
+            height: 20px;
+            border: none;
+            background-color: #b0cecb;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .table-header button:hover {
+            background-color: #7b948c;
+        }
+
         .table-body {
             display: flex;
             width: 100%;
@@ -158,9 +177,10 @@
                         <select v-model="selectTime" name="pets" id="pet-select">
                             <option v-for="data in searchTimes" :value="data.id">{{ data.date }}</option>
                         </select>
-                        <button>開始查詢</button>
+                        <button @click="search()">開始查詢</button>
                     </div>
-                    <div class="table-header">資料日期 : {{ lastTime }} </div>
+                    <div class="table-header">資料日期 : {{ tableData.updateTime ?? "none" }} <button @click="refreshData()"><i
+                                class="fa-solid fa-arrow-rotate-right"></i></button></div>
                     <div class="table-body">
                         <table>
                             <thead>
@@ -173,19 +193,20 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(data,key) in tableData">
-                                    <td>{{ key }}</td>
-                                    <td>{{ data.cash.cashBuyingRate }}</td>
-                                    <td>{{ data.cash.cashSellingRate}}</td>
-                                    <td>{{ data.spot.spotBuyingRate }}</td>
-                                    <td>{{ data.spot.spotSellingRate }}</td>
+                                <tr v-for="item in tableData.data">
+                                    <td>{{ item.currency }}</td>
+                                    <td>{{ item.cashBuyingRate }}</td>
+                                    <td>{{ item.cashSellingRate}}</td>
+                                    <td>{{ item.spotBuyingRate }}</td>
+                                    <td>{{ item.spotSellingRate }}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                    {{ tableData }}
                 </div>
                 <div v-else>
-                    {{ message }}
+                    <div>{{selectTime}}</div>
                 </div>
             </div>
             <footer></footer>
@@ -198,19 +219,28 @@
         setup() {
             const message = ref(/*[[${ message }]]*/)
             const tab = ref('外幣匯率')
-            const lastTime = ref(/*[[${ lastUpdateTime }]]*/)
             const tableData = ref(/*[[${ table }]]*/)
             const searchTimes = ref(/*[[${ searchTimes }]]*/)
             const selectTime = ref(/*[[${ searchTimes[0].id }]]*/)
 
             const changeTab = (tabName) => {
-                fetch('/exchangerate/refresh').then(res => res.json()).then(data => {
-                    console.log(data)
-                })
                 tab.value = tabName
             }
+
+            const refreshData = async () => {
+                await fetch('/exchangerate/refresh').then(res => res.json()).then(res => {
+                    tableData.value = res.data
+                })
+            }
+
+            const search = async () => {
+                await fetch(`/exchangerate/refresh/${selectTime.value}`).then(res => res.json()).then(res => {
+                    tableData.value = res.data
+                })
+            }
+
             return {
-                message, changeTab, tab, lastTime, tableData, searchTimes, selectTime
+                message, changeTab, tab, tableData, searchTimes, selectTime, refreshData, search
             }
         }
     }).mount('#app')
