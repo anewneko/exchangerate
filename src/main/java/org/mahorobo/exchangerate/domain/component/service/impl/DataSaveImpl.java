@@ -1,5 +1,7 @@
 package org.mahorobo.exchangerate.domain.component.service.impl;
 
+import java.util.Objects;
+
 import org.mahorobo.exchangerate.domain.component.service.DataSaveService;
 import org.mahorobo.exchangerate.domain.entity.FetchDetail;
 import org.mahorobo.exchangerate.domain.entity.FetchLog;
@@ -33,11 +35,10 @@ public class DataSaveImpl implements DataSaveService {
 			        		.map(e -> {
 			        			try {
 			        				var d = new FetchDetail();
-			        				var currency = e.getKey();
 			        				var spot = e.getValue().getAsJsonObject().getAsJsonObject("spot");
 			        				var cash = e.getValue().getAsJsonObject().getAsJsonObject("cash");
 			        				d.setLog(log);
-			        				d.setCurrency(Currency.getCurrency(currency));
+			        				d.setCurrency(Currency.getCurrency(e.getKey()));
 			        				d.setCashBuyingRate(cash.get("cashBuyingRate").getAsBigDecimal());
 			        				d.setCashSellingRate(cash.get("cashSellingRate").getAsBigDecimal());
 			        				d.setSpotBuyingRate(spot.get("spotBuyingRate").getAsBigDecimal());
@@ -47,7 +48,7 @@ public class DataSaveImpl implements DataSaveService {
 									return null;
 								}
 			        		})
-			        		.filter(d -> d != null)
+			        		.filter(Objects::nonNull)
 			        		.filter(d -> !Currency.OTHER.equals(d.getCurrency()))
 			        		.toList();
         
