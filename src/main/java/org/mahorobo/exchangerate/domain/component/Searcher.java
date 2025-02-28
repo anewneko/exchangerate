@@ -1,6 +1,7 @@
 package org.mahorobo.exchangerate.domain.component;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.mahorobo.exchangerate.domain.component.service.FetchDetailService;
 import org.mahorobo.exchangerate.domain.component.service.FetchLogService;
@@ -33,13 +34,21 @@ public class Searcher {
 	}
 	
 	public List<LineChartVO> getLineChart(String type, String currency) {
+		var limit = 30;
 		var data = fdSvc.findByCurrency(Currency.valueOf(currency));
+		var denominator = (int) Math.ceil((double) data.size() / limit);
 		switch (type) {
 		case "Cash": {
-			return data.stream().map(LineChartVO::cash).toList();
+			return IntStream.range(0, data.size())
+							.filter(i ->  i % denominator == 0)
+							.mapToObj(data::get)
+							.map(LineChartVO::cash).toList();
 		}
 		case "Spot": {
-			return data.stream().map(LineChartVO::spot).toList();
+			return IntStream.range(0, data.size())
+							.filter(i ->  i % denominator == 0)
+							.mapToObj(data::get)
+							.map(LineChartVO::spot).toList();
 		}
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + type);
