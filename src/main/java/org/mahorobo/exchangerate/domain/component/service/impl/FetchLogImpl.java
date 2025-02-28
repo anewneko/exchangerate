@@ -26,7 +26,7 @@ public class FetchLogImpl implements FetchLogService {
 		var endDate = new Date();
 		var startDate = Date.from(LocalDate.now().minusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant());
 		var r = repo.getInDays(startDate,endDate).stream().map(SearchTimesVO::of).toList();
-		return r.isEmpty() ? List.of() : r;
+		return r.isEmpty() ? List.of(new SearchTimesVO()) : r;
 	}
 
 	@Override

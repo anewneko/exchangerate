@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.mahorobo.exchangerate.domain.enums.Currency;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -29,10 +30,13 @@ public class FetchDetail {
 	
 	private Currency currency;
 	
+	@Column(precision = 10, scale = 4)
 	private BigDecimal cashBuyingRate;
+	@Column(precision = 10, scale = 4)
 	private BigDecimal cashSellingRate;
-	
+	@Column(precision = 10, scale = 4)
 	private BigDecimal spotBuyingRate;
+	@Column(precision = 10, scale = 4)
 	private BigDecimal spotSellingRate;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
