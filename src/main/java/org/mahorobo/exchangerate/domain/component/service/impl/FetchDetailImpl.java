@@ -5,6 +5,7 @@ import java.util.List;
 import org.mahorobo.exchangerate.domain.component.service.FetchDetailService;
 import org.mahorobo.exchangerate.domain.entity.FetchDetail;
 import org.mahorobo.exchangerate.domain.entity.FetchLog;
+import org.mahorobo.exchangerate.domain.enums.Currency;
 import org.mahorobo.exchangerate.repository.FetchDetailRepo;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,11 @@ public class FetchDetailImpl implements FetchDetailService {
 	@Override
 	public List<FetchDetail> findByLog(FetchLog log) {
 		return fdRepo.findByLog(log);
+	}
+
+	@Override
+	public List<FetchDetail> findByCurrency(Currency currency) {
+		return fdRepo.findByCurrency(currency);
 	}
 
 }

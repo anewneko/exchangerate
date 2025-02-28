@@ -79,8 +79,42 @@
 
         }
 
+        .tab2-searchbar {
+            width: 100%;
+            height: 100px;
+            padding: 0% 10%;
+            background-color: #b0cecb;
+            border-radius: 5px;
+            margin-top: 20px;
+            border: 2px solid #7b948c;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+        }
+
         .tab1-searchbar select {
             width: 400px;
+            height: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            border: 2px solid #7b948c;
+        }
+
+        .tab2-searchbar select {
+            width: 250px;
+            height: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            border: 2px solid #7b948c;
+        }
+
+        .tab2-searchbar button {
+            width: 150px;
             height: 50px;
             font-size: 16px;
             font-weight: bold;
@@ -154,6 +188,19 @@
         .table-body table tbody tr td {
             padding: 10px;
         }
+
+        .chart-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f1f1eb;
+            margin-top: 2rem;
+            padding: 3% 10%;
+            border-radius: 5px;
+            border: 2px solid #7b948c;
+        }
     </style>
 </head>
 
@@ -179,8 +226,8 @@
                         </select>
                         <button @click="search()">開始查詢</button>
                     </div>
-                    <div class="table-header">資料日期 : {{ tableData.updateTime ?? "none" }} <button @click="refreshData()"><i
-                                class="fa-solid fa-arrow-rotate-right"></i></button></div>
+                    <div class="table-header">資料日期 : {{ tableData.updateTime ?? "none" }} <button
+                            @click="refreshData()"><i class="fa-solid fa-arrow-rotate-right"></i></button></div>
                     <div class="table-body">
                         <table>
                             <thead>
@@ -203,10 +250,22 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ tableData }}
                 </div>
-                <div v-else>
-                    <div>{{selectTime}}</div>
+                <div v-else class="tab1-container">
+                    <div class="tab2-searchbar">
+                        <span>幣別 : </span>
+                        <select v-model="selectCurrency">
+                            <option v-for="data in currencies" :value="data">{{ data }}</option>
+                        </select>
+                        <select v-model="currencyType">
+                            <option value="Cash">現金匯率</option>
+                            <option value="Spot">即時匯率</option>
+                        </select>
+                        <button @click="searchCurrency()">開始查詢</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartjs-line"></canvas>
+                    </div>
                 </div>
             </div>
             <footer></footer>
@@ -222,9 +281,14 @@
             const tableData = ref(/*[[${ table }]]*/)
             const searchTimes = ref(/*[[${ searchTimes }]]*/)
             const selectTime = ref(/*[[${ searchTimes[0].id }]]*/)
+            const selectCurrency = ref("USD")
+            const currencies = ref(/*[[${ currencies }]]*/)
+            const currencyType = ref("Cash")
+            const lineChart = ref(/*[[${ lineChart }]]*/)
 
             const changeTab = (tabName) => {
                 tab.value = tabName
+                tabName == '歷史匯率' && inObserver(showChart,lineChart.value)
             }
 
             const refreshData = async () => {
@@ -239,48 +303,77 @@
                 })
             }
 
-            return {
-                message, changeTab, tab, tableData, searchTimes, selectTime, refreshData, search
+            const searchCurrency = async () => {
+                await fetch(`/exchangerate/linechart/${currencyType.value}/${selectCurrency.value}`).then(res => res.json()).then(res => {
+                    lineChart.value = res.data
+                })
+                showChart(lineChart.value)
             }
+
+            return {
+                message, changeTab, tab, tableData, searchTimes, selectTime, refreshData, search, currencies, selectCurrency, searchCurrency, currencyType, lineChart
+            }
+
         }
     }).mount('#app')
-    // new Chart(document.getElementById("chartjs-line"), {
-    //     type: "line",
-    //     data: {
-    //         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    //         datasets: [{
-    //             label: "Sales ($)",
-    //             fill: true,
-    //             backgroundColor: "transparent",
-    //             borderColor: window.theme.primary,
-    //             data: [2115, 1562, 1584, 1892, 1487, 2223, 2966, 2448, 2905, 3838, 2917, 3327]
-    //         }, {
-    //             label: "Orders",
-    //             fill: true,
-    //             backgroundColor: "transparent",
-    //             borderColor: "#adb5bd",
-    //             borderDash: [4, 4],
-    //             data: [958, 724, 629, 883, 915, 1214, 1476, 1212, 1554, 2128, 1466, 1827]
-    //         }]
-    //     },
-    //     options: {
-    //         scales: {
-    //             xAxes: [{
-    //                 reverse: true,
-    //                 gridLines: {
-    //                     color: "rgba(0,0,0,0.05)"
-    //                 }
-    //             }],
-    //             yAxes: [{
-    //                 borderDash: [5, 5],
-    //                 gridLines: {
-    //                     color: "rgba(0,0,0,0)",
-    //                     fontColor: "#fff"
-    //                 }
-    //             }]
-    //         }
-    //     }
-    // });
+
+
+    const inObserver = (callback , data) => {
+        const targetNode = document.getElementById('app');
+        const config = { childList: true, subtree: true };
+        const observer = new MutationObserver((mutationsList, observer) => {
+            for (let mutation of mutationsList)
+                mutation.type === 'childList' && callback(data) && observer.disconnect();
+        });
+        observer.observe(targetNode, config);
+    }
+
+    const showChart = (data) => {
+        $("#chartjs-line").remove();
+        const chartContainer = $(".chart-container");
+        chartContainer.append('<canvas id="chartjs-line"></canvas>');
+        const chartElement = document.getElementById("chartjs-line");
+        if (chartElement) {
+            new Chart(chartElement, {
+                type: "line",
+                data: {
+                    labels: data.map((item) => item.date),
+                    datasets: [{
+                        label: "本行買入",
+                        fill: true,
+                        backgroundColor: "transparent",
+                        borderColor: window.theme.primary,
+                        data: data.map((item) => item.buyingRate)
+                    }, {
+                        label: "本行賣出",
+                        fill: true,
+                        backgroundColor: "transparent",
+                        borderColor: "#adb5bd",
+                        data: data.map((item) => item.sellingRate)
+                    }]
+                },
+                options: {
+                    scales: {
+                        xAxes: [{
+                            reverse: true,
+                            gridLines: {
+                                color: "rgba(0,0,0,0)",
+                            }
+                        }],
+                        yAxes: [{
+                            borderDash: [5, 5],
+                            gridLines: {
+                                color: "rgba(0,0,0,0.3)",
+                                fontColor: "#fff"
+                            }
+                        }]
+                    }
+                }
+            });
+            return true;
+        };
+    };
+
 </script>
 
 </html>
