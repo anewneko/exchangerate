@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 
 @Service
 public class DataFetchImpl implements DataFetchService {
+	private final String regex = "[^A-Z]";
 
 	@Override
 	public JsonObject fetchAsJson() throws IOException {
@@ -39,7 +40,7 @@ public class DataFetchImpl implements DataFetchService {
             
             value.add("spot", spot);
             value.add("cash", cash);
-            jsonObject.add(key.replaceAll("[^A-Z]", ""), value);
+            jsonObject.add(key.replaceAll(regex, ""), value);
         }
 		return jsonObject;
 	}
@@ -51,12 +52,12 @@ public class DataFetchImpl implements DataFetchService {
         var elements = doc.select("tbody tr");
         for (Element element : elements) {
             String key = element.select(".xrt-cur-indent").text();
-			if (Currency.OTHER.equals(Currency.getCurrency(key.replaceAll("[^A-Z]", "")))) 
+			if (Currency.OTHER.equals(Currency.getCurrency(key.replaceAll(regex, "")))) 
 				continue;
 			var spotv = element.select(".rate-content-cash").text().split(" ");
 			var cashv = element.select(".rate-content-sight").text().split(" ");
 			var vo = new  ExchangeRateElementVO();
-			vo.setCurrency(key.replaceAll("[^A-Z]", ""));
+			vo.setCurrency(key.replaceAll(regex, ""));
 			vo.setCashBuyingRate(cashv[0]);
 			vo.setCashSellingRate(spotv[1]);
 			vo.setSpotBuyingRate(cashv[0]);

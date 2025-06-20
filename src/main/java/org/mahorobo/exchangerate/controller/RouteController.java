@@ -20,7 +20,6 @@ public class RouteController {
 	public String index(Model model) throws IOException {
 		model.addAttribute("table", coach.getData());
 		model.addAttribute("searchTimes", searcher.getTimeInDays());
-		model.addAttribute("message", "Hello, World!");
 		model.addAttribute("currencies", searcher.listCurrency());
 		model.addAttribute("lineChart", searcher.getLineChart("Cash","USD"));
 	    return "index";

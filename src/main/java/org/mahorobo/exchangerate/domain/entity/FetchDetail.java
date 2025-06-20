@@ -1,7 +1,6 @@
 package org.mahorobo.exchangerate.domain.entity;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.UUID;
 
 import org.mahorobo.exchangerate.domain.enums.Currency;
@@ -42,25 +41,5 @@ public class FetchDetail {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "logId")
 	private FetchLog log;
-	
-	public FetchDetail setCashBuyingRate(BigDecimal cashBuyingRate) {
-		this.cashBuyingRate = cashBuyingRate.setScale(6, RoundingMode.UNNECESSARY);
-		return this;
-	}
-	
-	public FetchDetail setCashSellingRate(BigDecimal cashSellingRate) {
-		this.cashSellingRate = cashSellingRate.setScale(6, RoundingMode.UNNECESSARY);
-		return this;
-	}
-	
-	public FetchDetail setSpotBuyingRate(BigDecimal spotBuyingRate) {
-		this.spotBuyingRate = spotBuyingRate.setScale(6, RoundingMode.UNNECESSARY);
-		return this;
-	}
-	
-	public FetchDetail setSpotSellingRate(BigDecimal spotSellingRate) {
-		this.spotSellingRate = spotSellingRate.setScale(6, RoundingMode.UNNECESSARY);
-		return this;
-	}
 
 }
